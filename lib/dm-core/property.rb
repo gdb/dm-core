@@ -340,7 +340,8 @@ module DataMapper
       :accessor, :reader, :writer,
       :lazy, :default, :key, :field,
       :index, :unique_index,
-      :unique, :allow_nil, :allow_blank, :required
+      :unique, :allow_nil, :allow_blank, :required,
+      :adapter_opts
     ]
 
     # Possible :visibility option values
@@ -354,7 +355,8 @@ module DataMapper
 
     attr_reader :primitive, :model, :name, :instance_variable_name,
       :reader_visibility, :writer_visibility, :options,
-      :default, :repository_name, :allow_nil, :allow_blank, :required
+      :default, :repository_name, :allow_nil, :allow_blank, :required,
+      :adapter_opts
 
     class << self
       extend Deprecate
@@ -763,6 +765,7 @@ module DataMapper
       @index        = @options.fetch(:index,        false)
       @unique_index = @options.fetch(:unique_index, @unique)
       @lazy         = @options.fetch(:lazy,         false) && !@key
+      @adapter_opts = @options.fetch(:adapter_opts, {})
 
       determine_visibility
 
@@ -815,6 +818,9 @@ module DataMapper
             unless VISIBILITY_OPTIONS.include?(value)
               raise ArgumentError, "options[:#{key}] must be #{VISIBILITY_OPTIONS.join(' or ')}"
             end
+
+          when :primitive_opts
+            assert_kind_of "options[:#{key}]", value, Hash
         end
       end
     end
